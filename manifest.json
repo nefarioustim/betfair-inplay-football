@@ -1,12 +1,12 @@
 {
-  "name": "Betfair",
-  "version": "0.1",
-  "description": "A Betfair Chrome extension.",
-  "browser_action": {
-    "default_icon": "betfair.png",
-    "popup": "popup.html"
-  },
-  "permissions": [
-    "http://beta.betfair.com/"
-  ]
+    "name": "Betfair In-play Football",
+    "version": "0.2",
+    "description": "Find out all the latest in-play football games on Betfair Beta.",
+    "browser_action": {
+        "default_icon": "betfair.png",
+        "popup": "popup.html"
+    },
+    "permissions": [
+        "http://beta.betfair.com/"
+    ]
 }
