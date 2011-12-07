@@ -1,0 +1,167 @@
+<style>
+    body {
+        min-width: 400px;
+        overflow-x: hidden;
+        font: 11px/1.4 tahoma, verdana, arial, sans-serif;
+    }
+    table {
+        width: 100%;
+        border-spacing: 0;
+    }
+    td {
+        font-size: 11px;
+        padding: 0.5em;
+    }
+    tr td:nth-child(1) {
+        width: 24px;
+    }
+    a {
+        display: inline-block;
+    }
+    .heading {
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 1em;
+        font-size: 13px;
+        font-weight: bold;
+    }
+    .button {
+        color: #000;
+        border: 1px solid;
+        -webkit-border-radius: 3px;
+        border-color: #BDCAD2;
+        background: -webkit-gradient(linear,left top,left bottom,from(#F8FBFD),to(#E1EEF7));
+        text-decoration: none;
+        padding: 3px 10px 4px;
+    }
+    .button:hover {
+        background: -webkit-gradient(linear,left top,left bottom,from(#D7ECFA),to(#BFE0F7));
+    }
+</style>
+<p id="load"><img src="http://sn2.cdnbf.net/page/images/loader_2337_.gif" style="vertical-align:middle;margin-right:10px;"> Loading&hellip;</p>
+<script>
+    var req = new XMLHttpRequest(),
+        req2 = new XMLHttpRequest();
+    req.open(
+        "GET",
+        "http://beta.betfair.com/inplayservice/v1.0/eventsInPlay?"
+        + "regionCode=UK&"
+        + "alt=json&"
+        + "locale=en_GB&"
+        + "maxResults=100&"
+        + "eventTypeIds=1&"
+        + "ts=" + new Date().getTime(),
+        true
+    );
+    req2.open(
+        "GET",
+        "http://beta.betfair.com/inplayservice/v1.0/eventsComingUp?"
+        + "regionCode=UK&"
+        + "alt=json&"
+        + "locale=en_GB&"
+        + "maxResults=100&"
+        + "eventTypeIds=1&"
+        + "ts=" + new Date().getTime(),
+        true
+    );
+    req.send(null);
+    req2.onload = showEvents;
+    req2.send(null);
+
+    function showEvents() {
+        var inPlayArray = JSON.parse(req.responseText)
+                            .slice(0, 9),
+            comingUpArray = JSON.parse(req2.responseText)
+                                .slice(0, 9 - (inPlayArray.length - 1)),
+            elTbody1 = document.createElement('tbody'),
+            elTbody2 = document.createElement('tbody'),
+            elTable1 = document.createElement('table'),
+            elTable2 = document.createElement('table'),
+            elHeading,
+            days = [
+                'Sunday',
+                'Monday',
+                'Tuesday',
+                'Wednesday',
+                'Thursday',
+                'Friday',
+                'Saturday'
+            ];
+
+        //elTable.innerHTML += '<thead></thead>';
+
+        if (inPlayArray.length > 0) {
+            elHeading1 = document.createElement('h1');
+            elHeading1.innerHTML = 'In-play';
+            document.body.appendChild(elHeading1);
+            elTable1.innerHTML += [
+                '<thead>',
+                '<tr>',
+                '<th scope="col">Betting</th>',
+                '<th scope="col">Event</th>',
+                '<th scope="col">Game Period</th>',
+                '<th scope="col">Score</th>',
+                '</tr>',
+                '</thead>'
+            ].join('');
+        }
+        inPlayArray.forEach(function(val, idx){
+            var state;
+
+            switch(val.state.status) {
+                case "FirstHalfEnd":
+                    state = "HT";
+                    break;
+                case "SecondHalfEnd":
+                    state = "FT";
+                    break;
+                case "FirstHalfKickOff":
+                case "SecondHalfKickOff":
+                default:
+                    state = val.state.timeElapsed + '&prime;';
+                    break;
+            }
+            elTbody1.innerHTML += [
+                '<tr>',
+                '<td><a class="button" href="http://beta.betfair.com/event?id=' + val.eventId + '" target="_blank">Bet!</a></td>',
+                '<td>' + val.eventName + '</td>',
+                '<td>' + state + '</td>',
+                '<td>' + val.state.score.home.score + ' - '
+                    + val.state.score.away.score + '</td>',
+                '</tr>'
+            ].join('');
+        });
+
+        elTable1.appendChild(elTbody1);
+        document.body.appendChild(elTable1);
+
+        if (comingUpArray.length > 0) {
+            elHeading = document.createElement('h1');
+            elHeading.innerHTML = 'Coming up';
+            document.body.appendChild(elHeading1);
+            elTable1.innerHTML += [
+                '<thead>',
+                '<tr>',
+                '<th scope="col">Betting</th>',
+                '<th scope="col">Event</th>',
+                '<th scope="col">When</th>',
+                '</tr>',
+                '</thead>'
+            ].join('');
+        }
+        comingUpArray.forEach(function(val, idx){
+            var start = new Date(val.startTime);
+
+            elTbody2.innerHTML += [
+                '<tr>',
+                '<td><a class="button" href="http://beta.betfair.com/event?id=' + val.eventId + '" target="_blank">Bet!</a></td>',
+                '<td>' + val.eventName + '</td>',
+                '<td>' + days[start.getDay()] + ' ' + start.getHours() + ':' + start.getMinutes() + '</td>',
+                '</tr>'
+            ].join('');
+        });
+
+        elTable2.appendChild(elTbody2);
+        document.body.appendChild(elTable2);
+        document.body.removeChild(document.getElementById("load"));
+    }
+</script>

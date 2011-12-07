@@ -1,0 +1,12 @@
+{
+  "name": "Betfair",
+  "version": "0.1",
+  "description": "A Betfair Chrome extension.",
+  "browser_action": {
+    "default_icon": "betfair.png",
+    "popup": "popup.html"
+  },
+  "permissions": [
+    "http://beta.betfair.com/"
+  ]
+}
