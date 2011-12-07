@@ -4,16 +4,45 @@
         overflow-x: hidden;
         font: 11px/1.4 tahoma, verdana, arial, sans-serif;
     }
+    h1 {
+        color: #273A47;
+        font: bold 18px "Helvetica Neue",sans-serif;
+        padding-bottom: 5px;
+        border-bottom: 2px solid;
+        margin-top: 1em;
+    }
+    h1:first-of-type {
+        margin-top: 0;
+    }
     table {
         width: 100%;
         border-spacing: 0;
     }
-    td {
+    td, th {
         font-size: 11px;
         padding: 0.5em;
     }
+    th {
+        color: #7E97A7;
+        font-weight: normal;
+    }
     tr td:nth-child(1) {
         width: 24px;
+        text-align: center;
+    }
+    tr td:nth-child(2) {
+        color: #2789CE;
+    }
+    tr td:nth-child(3),
+    tr td:nth-child(4) {
+        text-align: center;
+        font-weight: bold;
+    }
+    tr td:nth-child(3) {
+        color: #273A47;
+    }
+    tr td:nth-child(4) {
+        color: #8FB600;
     }
     a {
         display: inline-block;
@@ -74,13 +103,18 @@
     function showEvents() {
         var inPlayArray = JSON.parse(req.responseText)
                             .slice(0, 9),
-            comingUpArray = JSON.parse(req2.responseText)
-                                .slice(0, 9 - (inPlayArray.length - 1)),
+            comingUpArray = JSON.parse(req2.responseText),
+            comingUpArray = comingUpArray.sort(function(a, b){
+                a = new Date(a.startTime).getTime();
+                b = new Date(b.startTime).getTime();
+                return a-b
+            }).slice(0, 9 - (inPlayArray.length - 1)),
             elTbody1 = document.createElement('tbody'),
             elTbody2 = document.createElement('tbody'),
             elTable1 = document.createElement('table'),
             elTable2 = document.createElement('table'),
-            elHeading,
+            elHeading1,
+            elHeading2,
             days = [
                 'Sunday',
                 'Monday',
@@ -89,9 +123,12 @@
                 'Thursday',
                 'Friday',
                 'Saturday'
-            ];
-
-        //elTable.innerHTML += '<thead></thead>';
+            ],
+            zeroFill = function(number, width) {
+                width -= number.toString().length;
+                return ( width > 0 ) ?
+                    new Array( width + (/\./.test( number ) ? 2 : 1) ).join( '0' ) + number :number;
+            };
 
         if (inPlayArray.length > 0) {
             elHeading1 = document.createElement('h1');
@@ -102,47 +139,53 @@
                 '<tr>',
                 '<th scope="col">Betting</th>',
                 '<th scope="col">Event</th>',
-                '<th scope="col">Game Period</th>',
+                '<th scope="col">Period</th>',
                 '<th scope="col">Score</th>',
                 '</tr>',
                 '</thead>'
             ].join('');
+
+            inPlayArray.forEach(function(val, idx){
+                var state, score;
+                if (val.state) {
+                    switch(val.state.status) {
+                        case "FirstHalfEnd":
+                            state = "HT";
+                            break;
+                        case "SecondHalfEnd":
+                            state = "FT";
+                            break;
+                        case "KickOff":
+                        case "SecondHalfKickOff":
+                        default:
+                            state = val.state.timeElapsed + '&prime;';
+                            break;
+                    }
+                    score = val.state.score.home.score + ' - '
+                            + val.state.score.away.score;
+                } else {
+                    state = 'In-play';
+                    score = '';
+                }
+                elTbody1.innerHTML += [
+                    '<tr>',
+                    '<td><a class="button" href="http://beta.betfair.com/event?id=' + val.eventId + '" target="_blank">Bet!</a></td>',
+                    '<td>' + val.eventName + '</td>',
+                    '<td>' + state + '</td>',
+                    '<td>' + score + '</td>',
+                    '</tr>'
+                ].join('');
+            });
+
+            elTable1.appendChild(elTbody1);
+            document.body.appendChild(elTable1);
         }
-        inPlayArray.forEach(function(val, idx){
-            var state;
-
-            switch(val.state.status) {
-                case "FirstHalfEnd":
-                    state = "HT";
-                    break;
-                case "SecondHalfEnd":
-                    state = "FT";
-                    break;
-                case "FirstHalfKickOff":
-                case "SecondHalfKickOff":
-                default:
-                    state = val.state.timeElapsed + '&prime;';
-                    break;
-            }
-            elTbody1.innerHTML += [
-                '<tr>',
-                '<td><a class="button" href="http://beta.betfair.com/event?id=' + val.eventId + '" target="_blank">Bet!</a></td>',
-                '<td>' + val.eventName + '</td>',
-                '<td>' + state + '</td>',
-                '<td>' + val.state.score.home.score + ' - '
-                    + val.state.score.away.score + '</td>',
-                '</tr>'
-            ].join('');
-        });
-
-        elTable1.appendChild(elTbody1);
-        document.body.appendChild(elTable1);
 
         if (comingUpArray.length > 0) {
-            elHeading = document.createElement('h1');
-            elHeading.innerHTML = 'Coming up';
-            document.body.appendChild(elHeading1);
-            elTable1.innerHTML += [
+            elHeading2 = document.createElement('h1');
+            elHeading2.innerHTML = 'Coming up';
+            document.body.appendChild(elHeading2);
+            elTable2.innerHTML += [
                 '<thead>',
                 '<tr>',
                 '<th scope="col">Betting</th>',
@@ -151,21 +194,26 @@
                 '</tr>',
                 '</thead>'
             ].join('');
+
+            comingUpArray.forEach(function(val, idx){
+                var start = new Date(val.startTime),
+                    now = new Date(),
+                    displayDate = zeroFill(start.getHours(), 2) + ':' + zeroFill(start.getMinutes(), 2),
+                    displayDate = (start.getDay() === now.getDay()) ? displayDate : days[start.getDay()] + ' ' + displayDate;
+
+                elTbody2.innerHTML += [
+                    '<tr>',
+                    '<td><a class="button" href="http://beta.betfair.com/event?id=' + val.eventId + '" target="_blank">Bet!</a></td>',
+                    '<td>' + val.eventName + '</td>',
+                    '<td>' + displayDate + '</td>',
+                    '</tr>'
+                ].join('');
+            });
+
+            elTable2.appendChild(elTbody2);
+            document.body.appendChild(elTable2);
         }
-        comingUpArray.forEach(function(val, idx){
-            var start = new Date(val.startTime);
 
-            elTbody2.innerHTML += [
-                '<tr>',
-                '<td><a class="button" href="http://beta.betfair.com/event?id=' + val.eventId + '" target="_blank">Bet!</a></td>',
-                '<td>' + val.eventName + '</td>',
-                '<td>' + days[start.getDay()] + ' ' + start.getHours() + ':' + start.getMinutes() + '</td>',
-                '</tr>'
-            ].join('');
-        });
-
-        elTable2.appendChild(elTbody2);
-        document.body.appendChild(elTable2);
         document.body.removeChild(document.getElementById("load"));
     }
 </script>
