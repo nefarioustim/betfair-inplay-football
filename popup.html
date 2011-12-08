@@ -100,15 +100,34 @@
     req2.onload = showEvents;
     req2.send(null);
 
+    function sortByDateAndEvent(a, b){
+        x = new Date(a.startTime).getTime();
+        y = new Date(b.startTime).getTime();
+        if (x-y !== 0) {
+            return x-y;
+        } else {
+            if (a.eventName > b.eventName) {
+                return 1;
+            } else if (a.eventName < b.eventName) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
+    }
+
     function showEvents() {
         var inPlayArray = JSON.parse(req.responseText)
+                            .filter(function(i){
+                                return i.marketId[0] === '1';
+                            })
                             .slice(0, 9),
             comingUpArray = JSON.parse(req2.responseText),
-            comingUpArray = comingUpArray.sort(function(a, b){
-                a = new Date(a.startTime).getTime();
-                b = new Date(b.startTime).getTime();
-                return a-b
-            }).slice(0, 9 - (inPlayArray.length - 1)),
+            comingUpArray = comingUpArray.sort(sortByDateAndEvent)
+                                .filter(function(i){
+                                    return i.marketId[0] === '1';
+                                })
+                                .slice(0, 9 - (inPlayArray.length - 1)),
             elTbody1 = document.createElement('tbody'),
             elTbody2 = document.createElement('tbody'),
             elTable1 = document.createElement('table'),
@@ -126,8 +145,11 @@
             ],
             zeroFill = function(number, width) {
                 width -= number.toString().length;
-                return ( width > 0 ) ?
-                    new Array( width + (/\./.test( number ) ? 2 : 1) ).join( '0' ) + number :number;
+                return (width > 0) ?
+                    new Array(
+                        width
+                        + (/\./.test(number) ? 2 : 1)
+                    ).join('0') + number : number;
             };
 
         if (inPlayArray.length > 0) {
@@ -198,7 +220,11 @@
             comingUpArray.forEach(function(val, idx){
                 var start = new Date(val.startTime),
                     now = new Date(),
-                    displayDate = zeroFill(start.getHours(), 2) + ':' + zeroFill(start.getMinutes(), 2),
+                    displayDate = [
+                        zeroFill(start.getHours(), 2),
+                        ':',
+                        zeroFill(start.getMinutes(), 2)
+                    ].join(''),
                     displayDate = (start.getDay() === now.getDay()) ? displayDate : days[start.getDay()] + ' ' + displayDate;
 
                 elTbody2.innerHTML += [
