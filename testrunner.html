@@ -2,18 +2,17 @@
 <html lang="en-GB">
     <head>
         <meta charset="utf-8">
-        <title>Popup Tests - QUnit</title>
+        <title>BFChrome test runner</title>
         <link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" type="text/css">
+
         <script src="http://code.jquery.com/qunit/git/qunit.js"></script>
-        <script src="popup.js"></script>
-        <script>
-            test("zeroFill success", function() {
-                BF.InplayFootball.zeroFill();
-            });
-        </script>
+
+        <script src="bfchrome.inplayfootball.js"></script>
+
+        <script src="tests/test.bfchrome.inplayfootball.js"></script>
     </head>
     <body>
-        <h1 id="qunit-header">Popup Tests - QUnit</h1>
+        <h1 id="qunit-header">BFChrome test runner</h1>
         <h2 id="qunit-banner"></h2>
         <div id="qunit-testrunner-toolbar"></div>
         <h2 id="qunit-userAgent"></h2>
