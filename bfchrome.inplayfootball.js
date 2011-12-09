@@ -10,6 +10,8 @@ var BFChrome = window.BFChrome || {};
  */
 
 BFChrome.InPlayFootball = {
+    MAXIMUM_ROWS: 10,
+
     inPlayReq: new XMLHttpRequest(),
     comingUpReq: new XMLHttpRequest(),
 
@@ -51,8 +53,9 @@ BFChrome.InPlayFootball = {
     },
 
     sortByDateAndEvent: function(a, b){
-        x = new Date(a.startTime).getTime();
-        y = new Date(b.startTime).getTime();
+        var x = new Date(a.startTime).getTime(),
+            y = new Date(b.startTime).getTime();
+
         if (x-y !== 0) {
             return x-y;
         } else {
@@ -164,7 +167,7 @@ BFChrome.InPlayFootball = {
             "title": "In-play",
             "headings": ['Betting', 'Event', 'Period', 'Score'],
             "values": ['eventName', 'state', 'score'],
-            "rows": 10,
+            "rows": BFChrome.InPlayFootball.MAXIMUM_ROWS,
             "data": inPlayArray
         };
 
