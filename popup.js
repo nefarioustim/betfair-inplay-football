@@ -1,42 +1,47 @@
-(function(){
-    var req = new XMLHttpRequest(),
-        req2 = new XMLHttpRequest();
-    req.open(
-        "GET", [
-            "http://beta.betfair.com/inplayservice/v1.0/eventsInPlay?",
-            "regionCode=UK&",
-            "alt=json&",
-            "locale=en_GB&",
-            "maxResults=100&",
-            "eventTypeIds=1&",
-            "ts=" + new Date().getTime()
-        ].join(''), true
-    );
-    req2.open(
-        "GET", [
-            "http://beta.betfair.com/inplayservice/v1.0/eventsComingUp?",
-            "regionCode=UK&",
-            "alt=json&",
-            "locale=en_GB&",
-            "maxResults=100&",
-            "eventTypeIds=1&",
-            "ts=" + new Date().getTime()
-        ].join(''), true
-    );
-    req.send(null);
-    req2.onload = showEvents;
-    req2.send(null);
+var BF = window.BF || {};
 
-    function zeroFill(number, width) {
+BF.InplayFootball = {
+    inPlayReq: new XMLHttpRequest(),
+    comingUpReq: new XMLHttpRequest(),
+
+    init: function() {
+        BF.InplayFootball.inPlayReq.open(
+            "GET", [
+                "http://beta.betfair.com/inplayservice/v1.0/eventsInPlay?",
+                "regionCode=UK&",
+                "alt=json&",
+                "locale=en_GB&",
+                "maxResults=100&",
+                "eventTypeIds=1&",
+                "ts=" + new Date().getTime()
+            ].join(''), true
+        );
+        BF.InplayFootball.comingUpReq.open(
+            "GET", [
+                "http://beta.betfair.com/inplayservice/v1.0/eventsComingUp?",
+                "regionCode=UK&",
+                "alt=json&",
+                "locale=en_GB&",
+                "maxResults=100&",
+                "eventTypeIds=1&",
+                "ts=" + new Date().getTime()
+            ].join(''), true
+        );
+        BF.InplayFootball.inPlayReq.send(null);
+        BF.InplayFootball.comingUpReq.onload = BF.InplayFootball.showEvents;
+        BF.InplayFootball.comingUpReq.send(null);
+    },
+
+    zeroFill: function(number, width) {
         width -= number.toString().length;
         return (width > 0) ?
             new Array(
                 width +
                 (/\./.test(number) ? 2 : 1)
             ).join('0') + number : number;
-    }
+    },
 
-    function sortByDateAndEvent(a, b){
+    sortByDateAndEvent: function(a, b){
         x = new Date(a.startTime).getTime();
         y = new Date(b.startTime).getTime();
         if (x-y !== 0) {
@@ -50,9 +55,9 @@
                 return 0;
             }
         }
-    }
+    },
 
-    function getTableHead(headArray) {
+    getTableHead: function(headArray) {
         var html = ['<thead><tr>'];
 
         headArray.forEach(function(val){
@@ -66,14 +71,14 @@
         html.push(['</tr></thead>']);
 
         return html.join('');
-    }
+    },
 
-    function getTable() {
+    getTable: function() {
         return;
-    }
+    },
 
-    function showEvents() {
-        var inPlayArray = JSON.parse(req.responseText)
+    showEvents: function() {
+        var inPlayArray = JSON.parse(BF.InplayFootball.inPlayReq.responseText)
                             .filter(function filterData(i) {
                                 return i.marketId[0] === '1';
                             })
@@ -106,11 +111,11 @@
                                 return i;
                             }),
 
-            comingUpArray = JSON.parse(req2.responseText)
+            comingUpArray = JSON.parse(BF.InplayFootball.comingUpReq.responseText)
                                 .filter(function(i){
                                     return i.marketId[0] === '1';
                                 })
-                                .sort(sortByDateAndEvent)
+                                .sort(BF.InplayFootball.sortByDateAndEvent)
                                 .slice(0, 9 - (inPlayArray.length - 1))
                                 .map(function prepRow(i) {
                                     var start = new Date(i.startTime),
@@ -126,8 +131,8 @@
                                         ],
                                         isToday = (start.getDay() === now.getDay()),
                                         displayDate = [
-                                            zeroFill(start.getHours(), 2),
-                                            zeroFill(start.getMinutes(), 2)
+                                            BF.InplayFootball.zeroFill(start.getHours(), 2),
+                                            BF.InplayFootball.zeroFill(start.getMinutes(), 2)
                                         ].join(':');
 
                                     i.displayDate = isToday ?
@@ -158,7 +163,7 @@
             elHeading1 = document.createElement('h1');
             elHeading1.innerHTML = 'In-play';
             document.body.appendChild(elHeading1);
-            elTable1.innerHTML += getTableHead(['Betting', 'Event', 'Period', 'Score']);
+            elTable1.innerHTML += BF.InplayFootball.getTableHead(['Betting', 'Event', 'Period', 'Score']);
 
             inPlayArray.forEach(function renderRow(val, idx){
                 elTbody1.innerHTML += [
@@ -179,7 +184,7 @@
             elHeading2 = document.createElement('h1');
             elHeading2.innerHTML = 'Coming up';
             document.body.appendChild(elHeading2);
-            elTable2.innerHTML += getTableHead(['Betting', 'Event', 'When']);
+            elTable2.innerHTML += BF.InplayFootball.getTableHead(['Betting', 'Event', 'When']);
 
             comingUpArray.forEach(function renderRow(val, idx){
                 elTbody2.innerHTML += [
@@ -197,4 +202,6 @@
 
         document.body.removeChild(document.getElementById("load"));
     }
-})();
+};
+
+BF.InplayFootball.init();
