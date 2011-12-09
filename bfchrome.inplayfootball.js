@@ -9,7 +9,7 @@ var BFChrome = window.BFChrome || {};
     @author Tim Huegdon
  */
 
-BFChrome.InplayFootball = {
+BFChrome.InPlayFootball = {
     inPlayReq: new XMLHttpRequest(),
     comingUpReq: new XMLHttpRequest(),
 
@@ -42,12 +42,12 @@ BFChrome.InplayFootball = {
     },
 
     zeroFill: function(number, width) {
-        width -= number.toString().length;
+        width -= ~~number.toString().length;
         return (width > 0) ?
             new Array(
                 width +
                 (/\./.test(number) ? 2 : 1)
-            ).join('0') + number : number;
+            ).join('0') + number : number.toString();
     },
 
     sortByDateAndEvent: function(a, b){
