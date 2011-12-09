@@ -1,11 +1,20 @@
-var BF = window.BF || {};
+var BFChrome = window.BFChrome || {};
 
-BF.InplayFootball = {
+/**
+    The BFChrome.InPlayFootball module creates a
+    Google Chrome Extension pop-up version of the Betfair
+    In-Play Football website module.
+
+    @namespace Holds the In-play Football Chrome Extension
+    @author Tim Huegdon
+ */
+
+BFChrome.InplayFootball = {
     inPlayReq: new XMLHttpRequest(),
     comingUpReq: new XMLHttpRequest(),
 
     init: function() {
-        BF.InplayFootball.inPlayReq.open(
+        BFChrome.InplayFootball.inPlayReq.open(
             "GET", [
                 "http://beta.betfair.com/inplayservice/v1.0/eventsInPlay?",
                 "regionCode=UK&",
@@ -16,7 +25,7 @@ BF.InplayFootball = {
                 "ts=" + new Date().getTime()
             ].join(''), true
         );
-        BF.InplayFootball.comingUpReq.open(
+        BFChrome.InplayFootball.comingUpReq.open(
             "GET", [
                 "http://beta.betfair.com/inplayservice/v1.0/eventsComingUp?",
                 "regionCode=UK&",
@@ -27,9 +36,9 @@ BF.InplayFootball = {
                 "ts=" + new Date().getTime()
             ].join(''), true
         );
-        BF.InplayFootball.inPlayReq.send(null);
-        BF.InplayFootball.comingUpReq.onload = BF.InplayFootball.showEvents;
-        BF.InplayFootball.comingUpReq.send(null);
+        BFChrome.InplayFootball.inPlayReq.send(null);
+        BFChrome.InplayFootball.comingUpReq.onload = BFChrome.InplayFootball.showEvents;
+        BFChrome.InplayFootball.comingUpReq.send(null);
     },
 
     zeroFill: function(number, width) {
@@ -78,7 +87,7 @@ BF.InplayFootball = {
     },
 
     showEvents: function() {
-        var inPlayArray = JSON.parse(BF.InplayFootball.inPlayReq.responseText)
+        var inPlayArray = JSON.parse(BFChrome.InplayFootball.inPlayReq.responseText)
                             .filter(function filterData(i) {
                                 return i.marketId[0] === '1';
                             })
@@ -111,11 +120,11 @@ BF.InplayFootball = {
                                 return i;
                             }),
 
-            comingUpArray = JSON.parse(BF.InplayFootball.comingUpReq.responseText)
+            comingUpArray = JSON.parse(BFChrome.InplayFootball.comingUpReq.responseText)
                                 .filter(function(i){
                                     return i.marketId[0] === '1';
                                 })
-                                .sort(BF.InplayFootball.sortByDateAndEvent)
+                                .sort(BFChrome.InplayFootball.sortByDateAndEvent)
                                 .slice(0, 9 - (inPlayArray.length - 1))
                                 .map(function prepRow(i) {
                                     var start = new Date(i.startTime),
@@ -131,8 +140,8 @@ BF.InplayFootball = {
                                         ],
                                         isToday = (start.getDay() === now.getDay()),
                                         displayDate = [
-                                            BF.InplayFootball.zeroFill(start.getHours(), 2),
-                                            BF.InplayFootball.zeroFill(start.getMinutes(), 2)
+                                            BFChrome.InplayFootball.zeroFill(start.getHours(), 2),
+                                            BFChrome.InplayFootball.zeroFill(start.getMinutes(), 2)
                                         ].join(':');
 
                                     i.displayDate = isToday ?
@@ -163,7 +172,7 @@ BF.InplayFootball = {
             elHeading1 = document.createElement('h1');
             elHeading1.innerHTML = 'In-play';
             document.body.appendChild(elHeading1);
-            elTable1.innerHTML += BF.InplayFootball.getTableHead(['Betting', 'Event', 'Period', 'Score']);
+            elTable1.innerHTML += BFChrome.InplayFootball.getTableHead(['Betting', 'Event', 'Period', 'Score']);
 
             inPlayArray.forEach(function renderRow(val, idx){
                 elTbody1.innerHTML += [
@@ -184,7 +193,7 @@ BF.InplayFootball = {
             elHeading2 = document.createElement('h1');
             elHeading2.innerHTML = 'Coming up';
             document.body.appendChild(elHeading2);
-            elTable2.innerHTML += BF.InplayFootball.getTableHead(['Betting', 'Event', 'When']);
+            elTable2.innerHTML += BFChrome.InplayFootball.getTableHead(['Betting', 'Event', 'When']);
 
             comingUpArray.forEach(function renderRow(val, idx){
                 elTbody2.innerHTML += [
