@@ -203,5 +203,3 @@ BF.InplayFootball = {
         document.body.removeChild(document.getElementById("load"));
     }
 };
-
-BF.InplayFootball.init();
