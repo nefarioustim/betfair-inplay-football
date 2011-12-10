@@ -92,6 +92,7 @@ BFChrome.InPlayFootball = {
                             return BFChrome.InPlayFootball.AUS_MARKETS ||
                                 i.marketId[0] === '1';
                         })
+                        .sort(BFChrome.InPlayFootball.sortByDateAndEvent)
                         .slice(0, config.rows - 1)
                         .map(config.map),
             elTbody, elTable, elHead, elDiv;
