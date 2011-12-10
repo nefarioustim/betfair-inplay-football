@@ -79,42 +79,58 @@
 
     test('sortByDateAndEvent - Successfully sorts by date and then event', function(){
         var sort_data = [{
+                "eventTypeId": 1,
                 "startTime": "2011-12-09T19:30:00.000Z",
                 "eventName":"H Berlin v Schalke"
             },{
-               "startTime": "2011-12-09T20:00:00.000Z",
+                "eventTypeId": 1,
+                "startTime": "2011-12-09T20:00:00.000Z",
                 "eventName":"Bayern Munich v Pinky"
             },{
-               "startTime": "2011-12-11T19:30:00.000Z",
+                "eventTypeId": 1,
+                "startTime": "2011-12-11T19:30:00.000Z",
                 "eventName":"Man City v The World"
             },{
-               "startTime": "2011-12-09T19:30:00.000Z",
-                "eventName":"Coffee v Fridge"
+                "eventTypeId": 1,
+                "startTime": "2011-12-09T19:30:00.000Z",
+                "eventName":"Coffee v Fridge",
+                "relevance": 2
             },{
-               "startTime": "2011-12-09T19:30:00.000Z",
-                "eventName":"Arsenal v Spurs"
+                "eventTypeId": 1,
+                "startTime": "2011-12-09T19:30:00.000Z",
+                "eventName":"Arsenal v Spurs",
+                "relevance": 1
             },{
-               "startTime": "2011-12-11T19:30:00.000Z",
+                "eventTypeId": 1,
+                "startTime": "2011-12-11T19:30:00.000Z",
                 "eventName":"Cluj v London"
             }],
             expected = [{
-                "startTime":"2011-12-09T19:30:00.000Z",
-                "eventName":"Arsenal v Spurs"
+                "eventTypeId": 1,
+                "startTime": "2011-12-09T19:30:00.000Z",
+                "eventName": "Arsenal v Spurs",
+                "relevance": 1
             },{
-                "startTime":"2011-12-09T19:30:00.000Z",
-                "eventName":"Coffee v Fridge"
+                "eventTypeId": 1,
+                "startTime": "2011-12-09T19:30:00.000Z",
+                "eventName": "Coffee v Fridge",
+                "relevance": 2
             },{
-                "startTime":"2011-12-09T19:30:00.000Z",
-                "eventName":"H Berlin v Schalke"
+                "eventTypeId": 1,
+                "startTime": "2011-12-09T19:30:00.000Z",
+                "eventName": "H Berlin v Schalke"
             },{
-                "startTime":"2011-12-09T20:00:00.000Z",
-                "eventName":"Bayern Munich v Pinky"
+                "eventTypeId": 1,
+                "startTime": "2011-12-09T20:00:00.000Z",
+                "eventName": "Bayern Munich v Pinky"
             },{
-                "startTime":"2011-12-11T19:30:00.000Z",
-                "eventName":"Cluj v London"
+                "eventTypeId": 1,
+                "startTime": "2011-12-11T19:30:00.000Z",
+                "eventName": "Man City v The World"
             },{
-                "startTime":"2011-12-11T19:30:00.000Z",
-                "eventName":"Man City v The World"
+                "eventTypeId": 1,
+                "startTime": "2011-12-11T19:30:00.000Z",
+                "eventName": "Cluj v London"
             }];
 
         deepEqual(

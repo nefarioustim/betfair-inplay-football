@@ -13,7 +13,7 @@ var BFChrome = window.BFChrome || {};
 BFChrome.InPlayFootball = {
     MAXIMUM_ROWS: 10,
     AUS_MARKETS: false,
-    BUFFER_MULTIPLIER: 2,
+    BUFFER_MULTIPLIER: 5,
 
     inPlayReq: new XMLHttpRequest(),
     comingUpReq: new XMLHttpRequest(),
@@ -75,7 +75,8 @@ BFChrome.InPlayFootball = {
     },
 
     /**
-     *  Array.sort() function to sort by date and event.
+     *  Array.sort() function to sort by event type, relevance,
+     *  date and event.
      *
      *  @param {Number} a Value to compare
      *  @param {Number} b Value to compare
@@ -83,18 +84,35 @@ BFChrome.InPlayFootball = {
      *  @static
      */
     sortByDateAndEvent: function(a, b){
-        var x = new Date(a.startTime).getTime(),
-            y = new Date(b.startTime).getTime();
+        var x = a.eventTypeId,
+            y = b.eventTypeId;
 
         if (x-y !== 0) {
             return x-y;
         } else {
-            if (a.eventName > b.eventName) {
-                return 1;
-            } else if (a.eventName < b.eventName) {
-                return -1;
+            x = a.relevance || Number.POSITIVE_INFINITY;
+            y = b.relevance || Number.POSITIVE_INFINITY;
+
+            if (x-y !== 0) {
+                return x-y;
             } else {
-                return 0;
+                x = new Date(a.startTime).getTime();
+                y = new Date(b.startTime).getTime();
+
+                if (x-y !== 0) {
+                    return x-y;
+                } else {
+                    x = a.eventName.toLowerCase();
+                    y = b.eventName.toLowerCase();
+
+                    if (x > y) {
+                        return 1;
+                    } else if (x < y) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
             }
         }
     },
