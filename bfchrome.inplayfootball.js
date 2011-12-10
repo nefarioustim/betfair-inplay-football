@@ -17,6 +17,8 @@ BFChrome.InPlayFootball = {
 
     inPlayReq: new XMLHttpRequest(),
     comingUpReq: new XMLHttpRequest(),
+    inPlayRows: 0,
+    comingUpRows: 0,
 
     /**
      *  Initialises the module and fires the AJAX requests.
@@ -53,8 +55,9 @@ BFChrome.InPlayFootball = {
             ].join(''), true
         );
         BFChrome.InPlayFootball.inPlayReq.send(null);
-        BFChrome.InPlayFootball.comingUpReq.onload = BFChrome.InPlayFootball.showEvents;
         BFChrome.InPlayFootball.comingUpReq.send(null);
+        BFChrome.InPlayFootball.inPlayReq.onload = BFChrome.InPlayFootball.showInPlay;
+        BFChrome.InPlayFootball.comingUpReq.onload = BFChrome.InPlayFootball.showComingUp;
     },
 
     /**
@@ -217,7 +220,7 @@ BFChrome.InPlayFootball = {
      *
      *  @static
      */
-    showEvents: function() {
+    showInPlay: function() {
         var inPlayConfig = {
                 "title": "In-play",
                 "headings": ['Betting', 'Event', 'Period', 'Score'],
@@ -259,13 +262,31 @@ BFChrome.InPlayFootball = {
                     return i;
                 }
             },
-            inPlayDOM = BFChrome.InPlayFootball.getTableDOM(inPlayConfig),
-            comingUpConfig = {
+            inPlayDOM = BFChrome.InPlayFootball.getTableDOM(inPlayConfig);
+
+        if (inPlayDOM) {
+            BFChrome.InPlayFootball.inPlayRows = inPlayDOM[1];
+            document.body.appendChild(inPlayDOM[0]);
+        }
+
+        if (document.getElementById("load")) {
+            document.body.removeChild(document.getElementById("load"));
+        }
+    },
+
+    /**
+     *  Callback function used by AJAX requests. Creates tables
+     *  based on the data returned.
+     *
+     *  @static
+     */
+    showComingUp: function() {
+        var comingUpConfig = {
                 "title": "Coming up",
                 "headings": ['Betting', 'Event', 'When'],
                 "values": ['eventName', 'displayDate'],
-                "rows": inPlayDOM ?
-                    BFChrome.InPlayFootball.MAXIMUM_ROWS - inPlayDOM[1] :
+                "rows": BFChrome.InPlayFootball.inPlayRows > 0 ?
+                    BFChrome.InPlayFootball.MAXIMUM_ROWS - BFChrome.InPlayFootball.inPlayRows :
                     BFChrome.InPlayFootball.MAXIMUM_ROWS,
                 "data": JSON.parse(BFChrome.InPlayFootball.comingUpReq.responseText),
                 /**
@@ -305,14 +326,13 @@ BFChrome.InPlayFootball = {
             },
             comingUpDOM = BFChrome.InPlayFootball.getTableDOM(comingUpConfig);
 
-        if (inPlayDOM) {
-            document.body.appendChild(inPlayDOM[0]);
-        }
-
         if (comingUpDOM) {
+            BFChrome.InPlayFootball.comingUpRows = comingUpDOM[1];
             document.body.appendChild(comingUpDOM[0]);
         }
 
-        document.body.removeChild(document.getElementById("load"));
+        if (document.getElementById("load")) {
+            document.body.removeChild(document.getElementById("load"));
+        }
     }
 };
