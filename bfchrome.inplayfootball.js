@@ -206,6 +206,13 @@ BFChrome.InPlayFootball = {
                 "values": ['eventName', 'state', 'score'],
                 "rows": BFChrome.InPlayFootball.MAXIMUM_ROWS,
                 "data": JSON.parse(BFChrome.InPlayFootball.inPlayReq.responseText),
+                /**
+                 *  Map callback. Creates a single score string and
+                 *  replaces state with game time or period.
+                 *
+                 *  @param i Array row
+                 *  @returns {Array} Mutated array row
+                 */
                 "map": function prepRow(i) {
                     if (i.state) {
                         i.score = [
@@ -243,6 +250,13 @@ BFChrome.InPlayFootball = {
                     BFChrome.InPlayFootball.MAXIMUM_ROWS - inPlayDOM[1] :
                     BFChrome.InPlayFootball.MAXIMUM_ROWS,
                 "data": JSON.parse(BFChrome.InPlayFootball.comingUpReq.responseText),
+                /**
+                 *  Map callback. Creates a displayDate string within
+                 *  the array row.
+                 *
+                 *  @param i Array row
+                 *  @returns {Array} Mutated array row
+                 */
                 "map": function prepRow(i) {
                     var start = new Date(i.startTime),
                         now = new Date(),
