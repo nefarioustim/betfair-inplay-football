@@ -1,12 +1,13 @@
 var BFChrome = window.BFChrome || {};
 
 /**
-    The BFChrome.InPlayFootball module creates a
-    Google Chrome Extension pop-up version of the Betfair
-    In-Play Football website module.
-
-    @namespace Holds the In-play Football Chrome Extension
-    @author Tim Huegdon
+ *  The BFChrome.InPlayFootball module creates a
+ *  Google Chrome Extension pop-up version of the Betfair
+ *  In-Play Football website module.
+ *
+ *  @namespace Holds the In-play Football Chrome Extension
+ *  @author Tim Huegdon
+ *  @static
  */
 
 BFChrome.InPlayFootball = {
@@ -17,6 +18,11 @@ BFChrome.InPlayFootball = {
     inPlayReq: new XMLHttpRequest(),
     comingUpReq: new XMLHttpRequest(),
 
+    /**
+     *  Initialises the module and fires the AJAX requests.
+     *
+     *  @static
+     */
     init: function() {
         BFChrome.InPlayFootball.inPlayReq.open(
             "GET", [
@@ -51,6 +57,14 @@ BFChrome.InPlayFootball = {
         BFChrome.InPlayFootball.comingUpReq.send(null);
     },
 
+    /**
+     *  Returns number as a zero-fill string of width.
+     *
+     *  @param {Number} number The number to zero-fill
+     *  @param {Number} width The length of string to return.
+     *  @returns {String} Zero-filled numeric string
+     *  @static
+     */
     zeroFill: function(number, width) {
         width -= ~~number.toString().length;
         return (width > 0) ?
@@ -60,6 +74,14 @@ BFChrome.InPlayFootball = {
             ).join('0') + number : number.toString();
     },
 
+    /**
+     *  Array.sort() function to sort by date and event.
+     *
+     *  @param {Number} a Value to compare
+     *  @param {Number} b Value to compare
+     *  @returns {Number}[-1,0,1] Where to reposition value
+     *  @static
+     */
     sortByDateAndEvent: function(a, b){
         var x = new Date(a.startTime).getTime(),
             y = new Date(b.startTime).getTime();
@@ -77,6 +99,14 @@ BFChrome.InPlayFootball = {
         }
     },
 
+    /**
+     *  Returns a string of thead HTML with column-scoped headings
+     *  labelled by the array passed in.
+     *
+     *  @param {Array} headArray An array of headings to use
+     *  @returns {String} A string of thead HTML
+     *  @static
+     */
     getTableHead: function(headArray) {
         var html = ['<thead><tr>'];
 
@@ -93,6 +123,31 @@ BFChrome.InPlayFootball = {
         return html.join('');
     },
 
+    /**
+     *  Returns an array containing a DOM fragment and the number
+     *  of rows within the table, based on the configuration passed.
+     *
+     *  @param {Object} config Configuration object of structure:
+     *
+     *  {
+     *      "title": String,
+     *      "headings": Array of strings,
+     *      "values": Array of strings (first column is implied),
+     *      "rows": Number,
+     *      "data": Array,
+     *      "map": Function to map to each row of data
+     *  }
+     *
+     *  @returns {Array} Array of structure:
+     *
+     *  [
+     *      DOM fragment,
+     *      Number of rows following sort and filter
+     *  ]
+     *
+     *  If number of rows mutates to zero, returns false.
+     *  @static
+     */
     getTableDOM: function(config) {
         var data = config.data
                         .filter(function filterData(i) {
@@ -138,6 +193,12 @@ BFChrome.InPlayFootball = {
         return data.length > 0 ? [elDiv, data.length] : false;
     },
 
+    /**
+     *  Callback function used by AJAX requests. Creates tables
+     *  based on the data returned.
+     *
+     *  @static
+     */
     showEvents: function() {
         var inPlayConfig = {
                 "title": "In-play",
