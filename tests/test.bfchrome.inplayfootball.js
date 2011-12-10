@@ -132,13 +132,13 @@
         strictEqual(
             BFChrome.InPlayFootball.getTableHead(['Betting', 'Event', 'Period', 'Score']),
             '<thead><tr><th scope="col">Betting</th><th scope="col">Event</th><th scope="col">Period</th><th scope="col">Score</th></tr></thead>',
-            'Expecting correct table markup.'
+            'Expecting correct table head markup.'
         );
 
         strictEqual(
             BFChrome.InPlayFootball.getTableHead(['Foo', 'Bar', 'Baz']),
             '<thead><tr><th scope="col">Foo</th><th scope="col">Bar</th><th scope="col">Baz</th></tr></thead>',
-            'Expecting correct table markup.'
+            'Expecting correct table head markup.'
         );
     });
 
@@ -155,6 +155,51 @@
             typeof(BFChrome.InPlayFootball.getTableHead(['Betting'])),
             'string',
             'Expecting return type to be "string"'
+        );
+    });
+
+    test('getTableDOM - Returns expected DOM elements', function(){
+        var tableConfig = {
+            "title": "In-play",
+            "headings": ['Betting', 'Event', 'Period', 'Score'],
+            "values": ['eventName', 'state', 'score'],
+            "rows": BFChrome.InPlayFootball.MAXIMUM_ROWS,
+            "data": STUB.inPlay,
+            "map": function prepRow(i) {
+                if (i.state) {
+                    i.score = [
+                        i.state.score.home.score,
+                        ' - ',
+                        i.state.score.away.score
+                    ].join('');
+
+                    switch(i.state.status) {
+                        case "FirstHalfEnd":
+                            i.state = "HT";
+                            break;
+                        case "SecondHalfEnd":
+                            i.state = "FT";
+                            break;
+                        default:
+                            i.state = i.state.timeElapsed +
+                                        '&prime;';
+                            break;
+                    }
+                } else {
+                    i.score = '';
+                    i.state = 'In-play';
+                }
+
+                return i;
+            }
+        },
+        expected = '<h1>In-play</h1><table><thead><tr><th scope="col">Betting</th><th scope="col">Event</th><th scope="col">Period</th><th scope="col">Score</th></tr></thead><tbody><tr><td><a class="button" href="http://beta.betfair.com/event?id=26784925" target="_blank">Bet!</a></td><td>TSW Pegasus v South China</td><td>88′</td><td>2 - 2</td></tr></tbody></table>',
+        tableDOM = BFChrome.InPlayFootball.getTableDOM(tableConfig);
+
+        strictEqual(
+            tableDOM[0].innerHTML,
+            expected,
+            'Expecting correct table DOM elements.'
         );
     });
 })();

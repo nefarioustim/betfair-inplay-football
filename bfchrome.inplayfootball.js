@@ -10,7 +10,8 @@ var BFChrome = window.BFChrome || {};
  */
 
 BFChrome.InPlayFootball = {
-    MAXIMUM_ROWS: 10,
+    MAXIMUM_ROWS: 8,
+    AUS_MARKETS: false,
 
     inPlayReq: new XMLHttpRequest(),
     comingUpReq: new XMLHttpRequest(),
@@ -80,136 +81,135 @@ BFChrome.InPlayFootball = {
             ].join(''));
         });
 
-        html.push(['</tr></thead>']);
+        html.push('</tr></thead>');
 
         return html.join('');
     },
 
-    getTable: function() {
-        return;
+    getTableDOM: function(config) {
+        var data = config.data
+                        .filter(function filterData(i) {
+                            return BFChrome.InPlayFootball.AUS_MARKETS ||
+                                i.marketId[0] === '1';
+                        })
+                        .slice(0, config.rows - 1)
+                        .map(config.map),
+            elTbody, elTable, elHead, elDiv;
+
+        if (data.length > 0) {
+            elTBody = document.createElement('tbody');
+            elTable = document.createElement('table');
+            elHead = document.createElement('h1');
+            elDiv = document.createElement('div');
+
+            elHead.innerHTML = config.title;
+            elTable.innerHTML += BFChrome.InPlayFootball.getTableHead(
+                config.headings
+            );
+
+            data.forEach(function renderRow(val) {
+                var rowArray = [
+                    '<tr><td><a class="button" href="http://beta.betfair.com/event?id=' + val.eventId + '" target="_blank">Bet!</a></td>'
+                ];
+
+                config.values.forEach(function renderValue(innerVal) {
+                    rowArray.push(
+                        '<td>' + val[innerVal] + '</td>'
+                    );
+                });
+
+                rowArray.push('</tr>');
+                elTBody.innerHTML += rowArray.join('');
+            });
+
+            elTable.appendChild(elTBody);
+            elDiv.appendChild(elHead);
+            elDiv.appendChild(elTable);
+        }
+
+        return data.length > 0 ? [elDiv, data.length] : false;
     },
 
     showEvents: function() {
-        var inPlayArray = JSON.parse(BFChrome.InPlayFootball.inPlayReq.responseText)
-                            .filter(function filterData(i) {
-                                return i.marketId[0] === '1';
-                            })
-                            .slice(0, 9)
-                            .map(function prepRow(i) {
-                                if (i.state) {
-                                    i.score = [
-                                        i.state.score.home.score,
-                                        ' - ',
-                                        i.state.score.away.score
-                                    ].join('');
+        var inPlayConfig = {
+                "title": "In-play",
+                "headings": ['Betting', 'Event', 'Period', 'Score'],
+                "values": ['eventName', 'state', 'score'],
+                "rows": BFChrome.InPlayFootball.MAXIMUM_ROWS,
+                "data": JSON.parse(BFChrome.InPlayFootball.inPlayReq.responseText),
+                "map": function prepRow(i) {
+                    if (i.state) {
+                        i.score = [
+                            i.state.score.home.score,
+                            ' - ',
+                            i.state.score.away.score
+                        ].join('');
 
-                                    switch(i.state.status) {
-                                        case "FirstHalfEnd":
-                                            i.state = "HT";
-                                            break;
-                                        case "SecondHalfEnd":
-                                            i.state = "FT";
-                                            break;
-                                        default:
-                                            i.state = i.state.timeElapsed +
-                                                        '&prime;';
-                                            break;
-                                    }
-                                } else {
-                                    i.score = '';
-                                    i.state = 'In-play';
-                                }
+                        switch(i.state.status) {
+                            case "FirstHalfEnd":
+                                i.state = "HT";
+                                break;
+                            case "SecondHalfEnd":
+                                i.state = "FT";
+                                break;
+                            default:
+                                i.state = i.state.timeElapsed +
+                                            '&prime;';
+                                break;
+                        }
+                    } else {
+                        i.score = '';
+                        i.state = 'In-play';
+                    }
 
-                                return i;
-                            }),
+                    return i;
+                }
+            },
+            inPlayDOM = BFChrome.InPlayFootball.getTableDOM(inPlayConfig),
+            comingUpConfig = {
+                "title": "Coming up",
+                "headings": ['Betting', 'Event', 'When'],
+                "values": ['eventName', 'displayDate'],
+                "rows": inPlayDOM ?
+                    BFChrome.InPlayFootball.MAXIMUM_ROWS - inPlayDOM[1] :
+                    BFChrome.InPlayFootball.MAXIMUM_ROWS,
+                "data": JSON.parse(BFChrome.InPlayFootball.comingUpReq.responseText),
+                "map": function prepRow(i) {
+                    var start = new Date(i.startTime),
+                        now = new Date(),
+                        days = [
+                            'Sunday',
+                            'Monday',
+                            'Tuesday',
+                            'Wednesday',
+                            'Thursday',
+                            'Friday',
+                            'Saturday'
+                        ],
+                        isToday = (start.getDay() === now.getDay()),
+                        displayDate = [
+                            BFChrome.InPlayFootball.zeroFill(start.getHours(), 2),
+                            BFChrome.InPlayFootball.zeroFill(start.getMinutes(), 2)
+                        ].join(':');
 
-            comingUpArray = JSON.parse(BFChrome.InPlayFootball.comingUpReq.responseText)
-                                .filter(function(i){
-                                    return i.marketId[0] === '1';
-                                })
-                                .sort(BFChrome.InPlayFootball.sortByDateAndEvent)
-                                .slice(0, 9 - (inPlayArray.length - 1))
-                                .map(function prepRow(i) {
-                                    var start = new Date(i.startTime),
-                                        now = new Date(),
-                                        days = [
-                                            'Sunday',
-                                            'Monday',
-                                            'Tuesday',
-                                            'Wednesday',
-                                            'Thursday',
-                                            'Friday',
-                                            'Saturday'
-                                        ],
-                                        isToday = (start.getDay() === now.getDay()),
-                                        displayDate = [
-                                            BFChrome.InPlayFootball.zeroFill(start.getHours(), 2),
-                                            BFChrome.InPlayFootball.zeroFill(start.getMinutes(), 2)
-                                        ].join(':');
+                    i.displayDate = isToday ?
+                        displayDate
+                        : [
+                            days[start.getDay()],
+                            displayDate
+                        ].join(' ');
 
-                                    i.displayDate = isToday ?
-                                        displayDate
-                                        : [
-                                            days[start.getDay()],
-                                            displayDate
-                                        ].join(' ');
+                    return i;
+                }
+            },
+            comingUpDOM = BFChrome.InPlayFootball.getTableDOM(comingUpConfig);
 
-                                    return i;
-                                }),
-            elTbody1 = document.createElement('tbody'),
-            elTbody2 = document.createElement('tbody'),
-            elTable1 = document.createElement('table'),
-            elTable2 = document.createElement('table'),
-            elHeading1,
-            elHeading2;
-
-        var tableConfig = {
-            "title": "In-play",
-            "headings": ['Betting', 'Event', 'Period', 'Score'],
-            "values": ['eventName', 'state', 'score'],
-            "rows": BFChrome.InPlayFootball.MAXIMUM_ROWS,
-            "data": inPlayArray
-        };
-
-        if (inPlayArray.length > 0) {
-            elHeading1 = document.createElement('h1');
-            elHeading1.innerHTML = 'In-play';
-            document.body.appendChild(elHeading1);
-            elTable1.innerHTML += BFChrome.InPlayFootball.getTableHead(['Betting', 'Event', 'Period', 'Score']);
-
-            inPlayArray.forEach(function renderRow(val, idx){
-                elTbody1.innerHTML += [
-                    '<tr>',
-                    '<td><a class="button" href="http://beta.betfair.com/event?id=' + val.eventId + '" target="_blank">Bet!</a></td>',
-                    '<td>' + val.eventName + '</td>',
-                    '<td>' + val.state + '</td>',
-                    '<td>' + val.score + '</td>',
-                    '</tr>'
-                ].join('');
-            });
-
-            elTable1.appendChild(elTbody1);
-            document.body.appendChild(elTable1);
+        if (inPlayDOM) {
+            document.body.appendChild(inPlayDOM[0]);
         }
 
-        if (comingUpArray.length > 0) {
-            elHeading2 = document.createElement('h1');
-            elHeading2.innerHTML = 'Coming up';
-            document.body.appendChild(elHeading2);
-            elTable2.innerHTML += BFChrome.InPlayFootball.getTableHead(['Betting', 'Event', 'When']);
-
-            comingUpArray.forEach(function renderRow(val, idx){
-                elTbody2.innerHTML += [
-                    '<tr>',
-                    '<td><a class="button" href="http://beta.betfair.com/event?id=' + val.eventId + '" target="_blank">Bet!</a></td>',
-                    '<td>' + val.eventName + '</td>',
-                    '<td>' + val.displayDate + '</td>',
-                    '</tr>'
-                ].join('');
-            });
-
-            elTable2.appendChild(elTbody2);
-            document.body.appendChild(elTable2);
+        if (comingUpDOM) {
+            document.body.appendChild(comingUpDOM[0]);
         }
 
         document.body.removeChild(document.getElementById("load"));
