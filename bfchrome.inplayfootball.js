@@ -10,7 +10,7 @@ var BFChrome = window.BFChrome || {};
  */
 
 BFChrome.InPlayFootball = {
-    MAXIMUM_ROWS: 8,
+    MAXIMUM_ROWS: 10,
     AUS_MARKETS: false,
 
     inPlayReq: new XMLHttpRequest(),
