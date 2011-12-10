@@ -12,6 +12,7 @@ var BFChrome = window.BFChrome || {};
 BFChrome.InPlayFootball = {
     MAXIMUM_ROWS: 10,
     AUS_MARKETS: false,
+    BUFFER_MULTIPLIER: 2,
 
     inPlayReq: new XMLHttpRequest(),
     comingUpReq: new XMLHttpRequest(),
@@ -23,7 +24,10 @@ BFChrome.InPlayFootball = {
                 "regionCode=UK&",
                 "alt=json&",
                 "locale=en_GB&",
-                "maxResults=100&",
+                "maxResults=" + (
+                    BFChrome.InPlayFootball.MAXIMUM_ROWS *
+                    BFChrome.InPlayFootball.BUFFER_MULTIPLIER
+                ) + "&",
                 "eventTypeIds=1&",
                 "ts=" + new Date().getTime()
             ].join(''), true
@@ -34,7 +38,10 @@ BFChrome.InPlayFootball = {
                 "regionCode=UK&",
                 "alt=json&",
                 "locale=en_GB&",
-                "maxResults=100&",
+                "maxResults=" + (
+                    BFChrome.InPlayFootball.MAXIMUM_ROWS *
+                    BFChrome.InPlayFootball.BUFFER_MULTIPLIER
+                ) + "&",
                 "eventTypeIds=1&",
                 "ts=" + new Date().getTime()
             ].join(''), true
