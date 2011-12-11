@@ -77,7 +77,7 @@
         );
     });
 
-    test('sortByDateAndEvent - Successfully sorts by date and then event', function(){
+    test('sortEvents - Successfully sorts by date and then event', function(){
         var sort_data = [{
                 "eventTypeId": 1,
                 "startTime": "2011-12-09T19:30:00.000Z",
@@ -135,7 +135,7 @@
 
         deepEqual(
             sort_data.sort(
-                BFChrome.InPlayFootball.sortByDateAndEvent
+                BFChrome.InPlayFootball.sortEvents
             ),
             expected,
             'Expecting sorted array of objects.'
@@ -209,7 +209,7 @@
                 return i;
             }
         },
-        expected = '<h1>In-play</h1><table><thead><tr><th scope="col">Betting</th><th scope="col">Event</th><th scope="col">Period</th><th scope="col">Score</th></tr></thead><tbody><tr><td><a class="button" href="http://beta.betfair.com/event?id=26784925" target="_blank">Bet!</a></td><td>TSW Pegasus v South China</td><td>88′</td><td>2 - 2</td></tr></tbody></table>',
+        expected = '<h1>In-play</h1><table><thead><tr><th scope="col">Betting</th><th scope="col">Event</th><th scope="col">Period</th><th scope="col">Score</th></tr></thead><tbody><tr><td><a class="button" href="http://beta.betfair.com/football/event?id=26784925" target="_blank">Bet!</a></td><td>TSW Pegasus v South China</td><td>88′</td><td>2 - 2</td></tr></tbody></table>',
         tableDOM = BFChrome.InPlayFootball.getTableDOM(tableConfig);
 
         strictEqual(

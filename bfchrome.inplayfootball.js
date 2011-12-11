@@ -87,7 +87,7 @@ BFChrome.InPlayFootball = {
      *  @returns {Number}[-1,0,1] Where to reposition value
      *  @static
      */
-    sortByDateAndEvent: function(a, b){
+    sortEvents: function(a, b){
         var x = a.eventTypeId,
             y = b.eventTypeId;
 
@@ -176,7 +176,7 @@ BFChrome.InPlayFootball = {
                             return BFChrome.InPlayFootball.AUS_MARKETS ||
                                 i.marketId[0] === '1';
                         })
-                        .sort(BFChrome.InPlayFootball.sortByDateAndEvent)
+                        .sort(BFChrome.InPlayFootball.sortEvents)
                         .slice(0, config.rows - 1)
                         .map(config.map),
             elTbody, elTable, elHead, elDiv;
