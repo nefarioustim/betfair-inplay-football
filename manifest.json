@@ -12,6 +12,6 @@
         "popup": "popup.html"
     },
     "permissions": [
-        "http://beta.betfair.com/"
+        "http://*.betfair.com/"
     ]
 }
