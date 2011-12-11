@@ -1,6 +1,6 @@
 {
     "name": "Betfair In-play Football",
-    "version": "1.2",
+    "version": "1.3",
     "updates": "http://timhuegdon.com/chrome-extensions/betfair-inplay-football/updates.xml",
     "icons": {
         "16": "betfair.png",
