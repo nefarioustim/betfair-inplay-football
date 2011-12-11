@@ -93,14 +93,14 @@ BFChrome.InPlayFootball = {
         if (x-y !== 0) {
             return x-y;
         } else {
-            x = a.relevance || Number.POSITIVE_INFINITY;
-            y = b.relevance || Number.POSITIVE_INFINITY;
+            x = new Date(a.startTime).getTime();
+            y = new Date(b.startTime).getTime();
 
             if (x-y !== 0) {
                 return x-y;
             } else {
-                x = new Date(a.startTime).getTime();
-                y = new Date(b.startTime).getTime();
+                x = a.relevance || Number.POSITIVE_INFINITY;
+                y = b.relevance || Number.POSITIVE_INFINITY;
 
                 if (x-y !== 0) {
                     return x-y;
