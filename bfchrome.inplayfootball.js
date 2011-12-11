@@ -14,6 +14,7 @@ BFChrome.InPlayFootball = {
     MAXIMUM_ROWS: 10,
     AUS_MARKETS: false,
     BUFFER_MULTIPLIER: 5,
+    EVENT_PAGE: 'http://beta.betfair.com/football/event?id=',
 
     inPlayReq: new XMLHttpRequest(),
     comingUpReq: new XMLHttpRequest(),
@@ -193,7 +194,10 @@ BFChrome.InPlayFootball = {
 
             data.forEach(function renderRow(val) {
                 var rowArray = [
-                    '<tr><td><a class="button" href="http://beta.betfair.com/event?id=' + val.eventId + '" target="_blank">Bet!</a></td>'
+                    '<tr><td><a class="button" href="',
+                    BFChrome.InPlayFootball.EVENT_PAGE,
+                    val.eventId,
+                    '" target="_blank">Bet!</a></td>'
                 ];
 
                 config.values.forEach(function renderValue(innerVal) {
