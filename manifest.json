@@ -3,13 +3,13 @@
     "version": "1.3",
     "updates": "http://timhuegdon.com/chrome-extensions/betfair-inplay-football/updates.xml",
     "icons": {
-        "16": "betfair.png",
-        "48": "betfair48.png"
+        "16": "img/betfair.png",
+        "48": "img/betfair48.png"
     },
     "description": "Find out all the latest in-play football games on Betfair Beta.",
     "browser_action": {
-        "default_icon": "betfair.png",
-        "popup": "popup.html"
+        "default_icon": "img/betfair.png",
+        "popup": "pages/popup.html"
     },
     "permissions": [
         "http://*.betfair.com/"

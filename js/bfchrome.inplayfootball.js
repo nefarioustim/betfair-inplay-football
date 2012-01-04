@@ -233,26 +233,7 @@ BFChrome.InPlayFootball = {
             alt=json&
             locale=en_GB&
             types=MARKET_STATE,MARKET_DESCRIPTION,RUNNER_STATE,RUNNER_EXCHANGE_PRICES_BEST&
-            marketIds=1.104453789,
-                1.104453602,
-                1.104454883,
-                1.104455899,
-                1.104488376,
-                1.104488334,
-                1.104498087,
-                1.104502774,
-                1.104502685,
-                1.104475593,
-                1.104492992,
-                1.104493339,
-                1.104493168,
-                1.104493256,
-                1.104493080,
-                1.104493448,
-                1.104506152,
-                1.104506043,
-                1.104505946,
-                1.104505846&
+            marketIds=[comma separated list]&
             ts=1323638484617
     */
     },
